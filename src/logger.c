@@ -2,6 +2,8 @@
 #include "utils.h"
 
 #include <stdio.h>
+#include <time.h>
+#include <string.h>
 
 static void logger(const char *level, const char *message);
 

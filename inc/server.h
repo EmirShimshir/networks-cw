@@ -9,7 +9,7 @@
 typedef struct {
     int server_fd;
     pid_t child_pids[MAX_PROCESSES];
-    void (*handler)(int fd)
+    void (*handler)(int fd);
 } server_t;
 
 server_t *new_server(void (*handler)(int fd));

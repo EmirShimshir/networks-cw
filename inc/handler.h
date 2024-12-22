@@ -1,5 +1,5 @@
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef HANDLER_H
+#define HANDLER_H
 
 #define ROOT_DIR "./static"
 

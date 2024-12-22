@@ -1,5 +1,22 @@
 #include "prefork.h"
 #include "utils.h"
+#include "logger.h"
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/epoll.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <string.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+
 
 static void prefork_process(server_t *server);
 
@@ -7,14 +24,14 @@ int create_prefork(server_t *server) {
     for (int i = 0; i < MAX_PROCESSES; ++i) {
         pid_t pid = fork();
         if (pid == 0) {
-            prefork_process(server->server_fd, handler);
+            prefork_process(server);
             exit(0);
         } else if (pid > 0) {
             server->child_pids[i] = pid;
         } else {
             perror("Fork failed");
-            log_error("Fork failed");
-            return -1
+            log_msg(ERROR, "Fork failed");
+            return -1;
         }
     }
     return 0;
@@ -31,7 +48,7 @@ int monitor_prefork(server_t *server) {
         }
         if (pid == -1) {
             perror("waitpid");
-            return -1
+            return -1;
         }
 
         for (int i = 0; i < MAX_PROCESSES; ++i) {
@@ -41,7 +58,7 @@ int monitor_prefork(server_t *server) {
                 log_msg(INFO, buffer);
                 pid_t new_pid = fork();
                 if (new_pid == 0) {
-                    prefork_process(server->server_fd, handler);
+                    prefork_process(server);
                     exit(0);
                 } else if (new_pid > 0) {
                     server->child_pids[i] = new_pid;
@@ -49,7 +66,7 @@ int monitor_prefork(server_t *server) {
                     sprintf(buffer, "Child process restarted with pid: %d", new_pid);
                     log_msg(INFO, buffer);
                 } else {
-                    log_error("Failed to restart child process");
+                    log_msg(ERROR, "Failed to restart child process");
                 }
             }
             break;
@@ -65,7 +82,7 @@ static void prefork_process(server_t *server) {
     int epoll_fd = epoll_create1(0);
     if (epoll_fd == -1) {
         perror("Failed to create epoll instance");
-        log_error("Failed to create epoll instance");
+        log_msg(ERROR, "Failed to create epoll instance");
         exit(1);
     }
 
@@ -73,9 +90,9 @@ static void prefork_process(server_t *server) {
     event.events = EPOLLIN;
     event.data.fd = server->server_fd;
 
-    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_fd, &event) == -1) {
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server->server_fd, &event) == -1) {
         perror("Failed to add server_fd to epoll");
-        log_error("Failed to add server_fd to epoll");
+        log_msg(ERROR, "Failed to add server_fd to epoll");
         exit(1);
     }
 
@@ -93,7 +110,7 @@ static void prefork_process(server_t *server) {
                 }
                 if (client_fd == -1) {
                     perror("Failed accept");
-                    log_error("Failed accept");
+                    log_msg(ERROR, "Failed accept");
                     exit(1);
                 }
 
@@ -105,7 +122,7 @@ static void prefork_process(server_t *server) {
                 client_event.data.fd = client_fd;
                 if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &client_event) == -1) {
                     perror("Failed to add client_fd to epoll");
-                    log_error("Failed to add client_fd to epoll");
+                    log_msg(ERROR, "Failed to add client_fd to epoll");
                     close(client_fd);
                 }
             } else {
