@@ -113,6 +113,7 @@ static void prefork_process(server_t *server) {
                 if (client_fd == -1) {
                     perror("Failed accept");
                     log_msg(ERROR, "Failed accept");
+                    close(epoll_fd);
                     exit(1);
                 }
 
@@ -133,8 +134,6 @@ static void prefork_process(server_t *server) {
             }
         }
     }
-
-    close(epoll_fd);
 }
 
 
