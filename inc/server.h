@@ -4,6 +4,7 @@
 #include <sys/types.h>
 
 #define PORT 80
+#define MAX_PROCESSES 4
 
 typedef struct {
     int server_fd;
