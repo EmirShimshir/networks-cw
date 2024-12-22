@@ -1,7 +1,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#define LOGGER_ON 1
+#define LOGGER_ON 0
 #define INFO "INFO"
 #define ERROR "ERROR"
 #define LOGGER_FILE "server.log"
