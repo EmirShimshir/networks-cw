@@ -8,7 +8,6 @@ int main() {
     if (server == NULL) {
         return -1;
     }
-
     int err = 0;
     err = start_server(server);
     if (err != 0) {
@@ -20,7 +19,6 @@ int main() {
         clear_server(server);
         return err;
     }
-
     err = monitor_prefork(server);
     if (err != 0) {
         clear_server(server);
