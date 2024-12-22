@@ -1,0 +1,2 @@
+curl http://localhost:80/forbidden.txt
+<h1>403 Forbidden</h1>

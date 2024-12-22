@@ -1,0 +1,19 @@
+[Sun Dec 22 21:56:21 2024] [INFO] Server started
+[Sun Dec 22 21:56:27 2024] [INFO] New client connection accepted
+[Sun Dec 22 21:56:27 2024] [INFO] Handling request for file
+[Sun Dec 22 21:56:27 2024] [INFO] Sent response ok
+[Sun Dec 22 21:56:56 2024] [INFO] Sent response: 404 Not Found
+[Sun Dec 22 21:57:18 2024] [INFO] New client connection accepted
+[Sun Dec 22 21:57:18 2024] [INFO] Sent response: 405 Method Not Allowed
+[Sun Dec 22 22:00:33 2024] [INFO] Monitoring process terminated.
+[Sun Dec 22 22:00:33 2024] [INFO] Server socket closed
+[Sun Dec 22 22:00:33 2024] [INFO] Terminating child process with PID: 98814
+[Sun Dec 22 22:00:33 2024] [INFO] Terminating child process with PID: 98815
+[Sun Dec 22 22:00:33 2024] [INFO] Terminating child process with PID: 98816
+[Sun Dec 22 22:00:33 2024] [INFO] Terminating child process with PID: 98817
+[Sun Dec 22 22:00:33 2024] [INFO] child process with PID: 98814 terminated
+[Sun Dec 22 22:00:33 2024] [INFO] child process with PID: 98815 terminated
+[Sun Dec 22 22:00:33 2024] [INFO] child process with PID: 98816 terminated
+[Sun Dec 22 22:00:33 2024] [INFO] child process with PID: 98817 terminated
+[Sun Dec 22 22:00:33 2024] [INFO] Server shutting down...
+

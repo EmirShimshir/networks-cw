@@ -1,0 +1,5 @@
+curl -I http://localhost:80/index.html
+HTTP/1.1 200 OK
+Content-Length: 1415
+Content-Type: text/html
+Connection: close
