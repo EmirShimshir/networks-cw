@@ -1,2 +1,0 @@
-curl http://localhost:80/test.txt
-hello world

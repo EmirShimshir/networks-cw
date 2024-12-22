@@ -1,3 +1,0 @@
-curl -X POST http://localhost:80/index.html
-<h1>405 Method Not Allowed</h1>
-      
