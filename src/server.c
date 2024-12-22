@@ -5,15 +5,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
-#include <errno.h>
 #include <time.h>
+#include <signal.h>
+#include <sys/wait.h>
 
+static void terminate_children(server_t *server);
 
 server_t *new_server(void (*handler)(int fd)) {
     server_t *server = (server_t *)malloc(sizeof(server_t));
@@ -28,7 +26,6 @@ server_t *new_server(void (*handler)(int fd)) {
         server->child_pids[i] = -1;
     }
     server->handler = handler;
-
     return server;
 }
 
@@ -40,6 +37,10 @@ void clear_server(server_t *server) {
         close(server->server_fd);
         log_msg(INFO, "Server socket closed");
     }
+
+    terminate_children(server);
+
+    log_msg(INFO, "Server shutting down...");
     free(server);
 }
 
@@ -76,6 +77,25 @@ int start_server(server_t *server) {
         log_msg(ERROR, "Failed to set server socket to non-blocking");
         return -1;
     }
+
+    log_msg(INFO, "Server started");
     return 0;
+}
+
+static void terminate_children(server_t *server) {
+    for (int i = 0; i < MAX_PROCESSES; i++) {
+        if (server->child_pids[i] > 0) {
+            log_msg_int(INFO, "Terminating child process with PID: %d", server->child_pids[i]);
+            kill(server->child_pids[i], SIGTERM);
+        }
+    }
+
+    for (int i = 0; i < MAX_PROCESSES; i++) {
+        if (server->child_pids[i] > 0) {
+            int status;
+            waitpid(server->child_pids[i], &status, 0);
+            log_msg_int(INFO, "child process with PID: %d terminated", server->child_pids[i]);
+        }
+    }
 }
 

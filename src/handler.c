@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <assert.h>
 
 
 
@@ -67,6 +68,7 @@ static void serve_static_file(int fd, const char *file_path) {
         write(fd, buffer, bytes_read);
     }
 
+    log_msg(INFO, "Sent response ok");
     close(file_fd);
     close(fd);
 }
@@ -79,7 +81,6 @@ static void send_response(int fd, int status, const char *status_text, const cha
                                  "Content-Type: %s\r\n"
                                  "Connection: close\r\n\r\n",
                                  status, status_text, body_length, content_type);
-
     write(fd, header, header_length);
     if (body && body_length > 0) {
         write(fd, body, body_length);

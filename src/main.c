@@ -1,12 +1,11 @@
 #include "server.h"
 #include "prefork.h"
 #include "handler.h"
-
 #include <stddef.h>
 
 int main() {
     server_t *server = new_server(handle_client_request);
-    if (server != NULL) {
+    if (server == NULL) {
         return -1;
     }
 

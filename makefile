@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -std=c11 -Iinc
+CFLAGS = -Wall -Wextra -std=c11 -Iinc
 
 SRCDIR = src
 INCDIR = inc

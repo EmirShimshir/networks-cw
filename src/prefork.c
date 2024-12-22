@@ -15,10 +15,12 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
-
+volatile sig_atomic_t stop_requested = 0;
 
 static void prefork_process(server_t *server);
+static void handle_signal(int signal);
 
 int create_prefork(server_t *server) {
     for (int i = 0; i < MAX_PROCESSES; ++i) {
@@ -36,8 +38,11 @@ int create_prefork(server_t *server) {
     }
     return 0;
 }
+
 int monitor_prefork(server_t *server) {
-    while (1) {
+    signal(SIGINT, handle_signal);
+
+    while (!stop_requested) {
         int status;
         pid_t pid = waitpid(-1, &status, WNOHANG);
         if (pid == 0) {
@@ -53,18 +58,14 @@ int monitor_prefork(server_t *server) {
 
         for (int i = 0; i < MAX_PROCESSES; ++i) {
             if (server->child_pids[i] == pid) {
-                char buffer[1024];
-                sprintf(buffer, "Child process pid: %d exited, restarting...", pid);
-                log_msg(INFO, buffer);
+                log_msg_int(INFO, "Child process pid: %d exited, restarting...", pid);
                 pid_t new_pid = fork();
                 if (new_pid == 0) {
                     prefork_process(server);
                     exit(0);
                 } else if (new_pid > 0) {
                     server->child_pids[i] = new_pid;
-                    char buffer[1024];
-                    sprintf(buffer, "Child process restarted with pid: %d", new_pid);
-                    log_msg(INFO, buffer);
+                    log_msg_int(INFO, "Child process restarted with pid: %d", new_pid);
                 } else {
                     log_msg(ERROR, "Failed to restart child process");
                 }
@@ -72,6 +73,7 @@ int monitor_prefork(server_t *server) {
             break;
         }
     }
+    log_msg(INFO, "Monitoring process terminated.");
     return 0;
 }
 
@@ -133,4 +135,12 @@ static void prefork_process(server_t *server) {
     }
 
     close(epoll_fd);
+}
+
+
+
+static void handle_signal(int signal) {
+    if (signal == SIGINT) {
+        stop_requested = 1;
+    }
 }
